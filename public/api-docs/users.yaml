@@ -1,0 +1,187 @@
+definitions:        # Schema defination for request body
+  users:
+    type: object
+    required: 
+      - firstname
+      - lastname
+      - email
+      - password
+    properties:
+      firstname:
+        type: string
+      lastname:
+        type: string
+      email:
+        type: string
+      password:
+        type: string
+        description: Password for login
+paths:
+  /api/user/register:      # path of your endpoint
+    post:                 # endpoint request type (post request)
+      tags:               # Tag property
+        - Users         # Value of the tag
+      summary: Creates A New User
+      requestBody:
+        required: true
+        content: 
+          application/json:
+            schema:
+              $ref: '#/definitions/users'          
+      responses:
+        '201':
+          description: User is successful registered
+        '500':
+          description: Internal server error
+        '409':
+          description: Already exists
+        '400':
+          description: Bad request 
+  /api/users:           # path of your endpoint
+    get:                 # endpoint request type (post request)
+      tags:               # Tag property
+        - Users         # Value of the tag
+      summary: Get all users        
+      responses:
+        '200':
+          description: Users fetched successfully
+        '500':
+          description: Internal server Error
+        '401':
+          description: Unauthorized  
+
+  /api/verify-user?token={emailToken}:           # path of your endpoint
+    get:                 
+      tags:               
+        - Users         
+      summary: Verifies A Newerly Registered User
+      parameters:
+      - in: path
+        name: emailToken
+        schema:
+          type: string
+        required: true
+        description: Email Token        
+      responses:
+        '200':
+          description: User Verified Successfully
+        '404':
+          description: User Not Found
+        '500':
+          description: Server Not Found
+  /api/user/login:           # path of your endpoint
+    post:                 # endpoint request type (post request)
+      tags:               # Tag property
+        - Users         # Value of the tag
+      summary: Login using email and password
+      requestBody:
+        required: true
+        content: 
+          application/json:
+            schema:
+              required:
+                - email
+                - password
+              properties:
+                email:
+                  type: string
+                  description: email of the user
+                password:
+                  type: string
+                  description: password of the user         
+      responses:          # server responses
+        '200':
+          description: A user is logged in
+        '400':
+          description: Bad request
+  /api/user/refresh:           # path of your endpoint
+    post:                 # endpoint request type (post request)
+      tags:               # Tag property
+        - Users         # Value of the tag
+      summary: Getting new user Access token from refresh token
+      requestBody:
+        required: true
+        content: 
+          application/json:
+            schema:
+              required:
+                - refreshTokenKey
+              properties:
+                refreshTokenKey:
+                  type: string
+                  description: Refresh Token key
+                      
+      responses:          # server responses
+        '200':
+          description: Access token created succesfully
+        '400':
+          description: Bad request
+
+  /api/user/logout:           # path of your endpoint
+    delete:                 # endpoint request type (post request)
+      tags:               # Tag property
+        - Users         # Value of the tag
+      summary: Logging out of session                  
+      responses:          # server responses
+        '204':
+          description: User logged out succesfully
+        '400':
+          description: Bad request
+
+  /api/v1/forgot-password:           # path of your endpoint
+    post:                 # endpoint request type (post request)
+      tags:               # Tag property
+        - Users         # Value of the tag
+      summary: Requests a password reset for a verified casual user
+      requestBody:
+        required: true
+        content: 
+          application/json:
+            schema:
+              required:
+                - email
+              properties:
+                email:
+                  type: string
+                  description: email of the user       
+      responses:          # server responses
+        '200':
+          description: Password Reset Request Sent Successfully 
+        '400':
+          description: Bad Request
+        '500':
+          description: Internal Server Error
+
+  /api/v1/reset-password?token={emailToken}:           # path of your endpoint
+    patch:                 # endpoint request type (post request)
+      tags:               # Tag property
+        - Users         # Value of the tag
+      summary: Updates the password to the new assigned password
+      requestBody:
+          required: true
+          content:
+            application/json:
+              schema:
+                required:
+                  - password
+                properties:
+                  password:
+                    type: string
+                    description: New user password
+      parameters:
+      - in: path
+        name: emailToken
+        schema:
+          type: string
+        required: true
+        description: Reset Password Email Token
+      responses:
+        '200':
+          description: Password Updated Successfully
+        '401':
+          description: Expired Access Token
+        '404':
+          description: User Not Found Or No Token Found
+        '500':
+          description: Internal Server Error
+
